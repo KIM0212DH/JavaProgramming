@@ -1,6 +1,6 @@
 package kr.co.javaex.ex13;
 
-public class Dog extends Animal{
+class Dog extends Animal{
     @Override
     public void sound() {
         System.out.println("멍멍");
