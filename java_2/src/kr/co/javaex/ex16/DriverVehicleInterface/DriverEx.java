@@ -1,6 +1,5 @@
 package kr.co.javaex.ex16.DriverVehicleInterface;
 
-import kr.co.javaex.ex16.java_16_2_ex4_interface.B;
 
 public class DriverEx {
     public static void main(String[] args) {

@@ -15,7 +15,7 @@ public class Television implements RemoteControl {
     public void setVolumn(int volumn) {
         if (volumn > MAX_VOLUMN){
             volumn = 10;
-        } else if (volumn < 0) {
+        } else if (volumn < MIN_VOLUMN) {
             volumn = 0;
         }
         System.out.println("현재 TV 볼륨: " + volumn);
