@@ -1,6 +1,5 @@
 package kr.co.javaex.ex14.animal;
 
-import kr.co.javaex.ex13.package1.A;
 
 public class AbstractEx {
     public static void main(String[] args) {
