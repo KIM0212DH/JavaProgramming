@@ -6,7 +6,7 @@ public class PersonCustomExceptionEx {
 
         try {
             personCustomException.setAge(-30);
-        }catch (PersonCustomException e){
+        } catch (PersonCustomException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }

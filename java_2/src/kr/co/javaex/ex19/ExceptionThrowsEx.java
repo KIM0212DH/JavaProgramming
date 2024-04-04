@@ -4,8 +4,7 @@ public class ExceptionThrowsEx {
     public static void main(String[] args) {
         try {
             findclass();
-        }
-        catch (ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             System.out.println("예외 처리: " + e.getMessage());
         }
     }
