@@ -198,7 +198,7 @@ public class TbEx {
         String inputNmTitle = createScanner.nextLine();
         newTbBoard.setNmTitle(inputNmTitle);
 
-        System.out.print("글 내용을 입력하세요: ");
+        System.out.print("글 내용을 입력하세요(입력 종료를 위해선 \"END\" 입력): ");
         String inputNmContent = multiLineStatement(new Scanner(System.in));
         newTbBoard.setNmcontent(inputNmContent);
 
