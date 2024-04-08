@@ -40,7 +40,8 @@ public class JDBCEx {
 
 
             // 테스트 레코드 추가
-//            String insertValueSql = "INSERT INTO USERS(ID_USER, NM_USER, ID_PASWD, NB_AGE,ID_EMAIL)" + "VALUES(?,?,?,?,?)";
+//            String insertValueSql = "INSERT INTO USERS(ID_USER, NM_USER,
+//            ID_PASWD, NB_AGE,ID_EMAIL)" + "VALUES(?,?,?,?,?)";
 //            pstmt = conn.prepareStatement(insertValueSql);
 //            pstmt.setString(1, "test1");
 //            pstmt.setString(2, "홍길동");
