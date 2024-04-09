@@ -233,11 +233,8 @@ public class TbOrderItem {
             e.printStackTrace();
         }
 
-        String insertOrderItemSql = "insert into tb_order_item(id_order_item, " +
-                "id_order, cn_order_item, no_product, no_user," +
-                "qt_unit_price, qt_order_item, qt_order_item_amount, " +
-                "qt_order_item_delivery_fee) " +
-                "values('OT'||LPAD(seq_tb_order_item.nextval,7,'0'),?,?,?,?,?,?,?,?)";
+        String insertOrderItemSql = "insert into tb_order_item(id_order_item, id_order, cn_order_item, no_product, no_user,qt_unit_price, qt_order_item, qt_order_item_amount, qt_order_item_delivery_fee) values('OT'||LPAD(seq_tb_order_item.nextval,7,'0'),?,?,?,?,?,?,?,?)";
+//                "values('OT'||LPAD(SEQ_TB_ORDER_ITEM.nextval,7,'0'),?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement pstmt = connection.prepareStatement(insertOrderItemSql);
             pstmt.setString(1, nowSeq);

@@ -209,7 +209,7 @@ public class TbOrder {
 
     public String orderingBasket(Connection connection, TbUser tbUser, int totalDeliverFee, int totalPrice) {
         String inserting = "insert into tb_order(id_order, no_user, qt_order_amount, qt_deli_money, qt_deli_period, nm_order_person) " +
-                "values('OR'||LPAD(seq_tb_order.nextval,7,'0'), ?, ?,?,0,?)";
+                "values('OR'||LPAD(seq_tb_order.nextval,7,'0'),?,?,?,0,?)";
         try {
             PreparedStatement pstmt = connection.prepareStatement(inserting);
             pstmt.setString(1, tbUser.getNoUser());
