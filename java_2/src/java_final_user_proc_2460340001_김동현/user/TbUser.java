@@ -1,5 +1,11 @@
 package java_final_user_proc_2460340001_김동현.user;
 
+import java_final_user_proc_2460340001_김동현.ProcEx;
+import java_final_user_proc_2460340001_김동현.category.TbCategory;
+import java_final_user_proc_2460340001_김동현.ecommerce.TbBasket;
+import java_final_user_proc_2460340001_김동현.ecommerce.TbBasketItem;
+import java_final_user_proc_2460340001_김동현.ecommerce.TbOrder;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -108,7 +114,7 @@ public class TbUser {
         String tryId = loginScanner.nextLine();
         System.out.print("비밀번호를 입력하세요.>");
         String tryPW = loginScanner.nextLine();
-        String selectUser = "select id_user, nm_passwd, CD_USER_TYPE from tb_user " +
+        String selectUser = "select id_user, nm_passwd, CD_USER_TYPE, no_user from tb_user " +
                 "where id_user = ? and nm_passwd = ?";
         try {
             PreparedStatement pstmt = connection.prepareStatement(selectUser);
@@ -120,16 +126,19 @@ public class TbUser {
             String targetId = "";
             String targetPW = "";
             String targetType = "";
+            String targetNo = "";
             while (rs.next()) {
                 rowcount++;
                 targetId = rs.getString(1);
                 targetPW = rs.getString(2);
                 targetType = rs.getString(3);
+                targetNo = rs.getString(4);
             }
             if (rowcount == 1) {
                 tbUser.setIdUser(targetId);
                 tbUser.setNmPaswd(targetPW);
                 tbUser.setCdUserType(targetType);
+                tbUser.setNoUser(targetNo);
                 System.out.println(tbUser.getIdUser() + " 계정에 로그인 하였습니다.");
                 keep = 2;
             } else {
@@ -253,5 +262,64 @@ public class TbUser {
         return numInputValid();
     }
 
+    public int showGeneralMenu() {
+        System.out.println("------------------------------------------------");
+        System.out.println("1.카테고리 조회, 2.로그아웃");
+        System.out.print("선택>");
+        return numInputValid();
+    }
+
+    public int funcGeneralMenu(int menu, int keep, Connection connection, TbBasket tbBasket, TbBasketItem tbBasketItem, TbOrder tbOrder, TbUser tbUser) {
+        switch (menu) {
+            case 1:
+                // 카테고리 조회
+                // 카테고리 조회하고 조회한 카테고리 안에서 카트에 추가, 카트에 삭제, 카트 주문, 개별 상품 주문 수행
+                TbCategory targetCategory = new TbCategory();
+                targetCategory.oneDepthlistUpCategory(connection);
+                System.out.print("조회하고 싶은 하위 카테고리를 선택하세요.>");
+                int detailCategory = new Scanner(System.in).nextInt();
+                targetCategory.twoDepthListUpCategory(connection, detailCategory);
+
+                System.out.print("상세 조회하고 싶은 카테고리를 선택하세요.>");
+                detailCategory = new Scanner(System.in).nextInt();
+                TbCategory detailTargetCategory = new TbCategory();
+                detailTargetCategory = targetCategory.selectCategory(connection, detailCategory);
+                System.out.println("------------------------------------------------");
+                System.out.print("1.카트에 상품 추가, 2.카트에서 상품 삭제, 3.카트 주문, 4.개별 상품 주문, 5.상위 메뉴.>");
+                int doAction = ProcEx.numInputValid();
+                String nowUserNo = tbUser.getNoUser();
+                int nowBasketNo = tbBasketItem.getNbBasketItem();
+                System.out.println(nowBasketNo+"sdfdsf");
+                if (doAction == 1) {
+                    // 카트에 상품 추가
+                    System.out.println(nowUserNo);
+                    System.out.println(nowBasketNo);
+                    System.out.print("카트에 추가하고 싶은 상품 번호를 입력하세요.>");
+                    String nowProduct = new Scanner(System.in).nextLine();
+                    System.out.print("카트에 추가하고 싶은 개수를 입력하세요.>");
+                    int nowAmount = ProcEx.numInputValid();
+                    tbBasketItem.insertIntoBasketItem(connection, nowUserNo, nowBasketNo, nowProduct, nowAmount);
+                    tbBasket.calculateBasket(connection, nowUserNo, nowBasketNo);
+                } else if (doAction == 2) {
+                    // 카트에서 상품 삭제
+
+                } else if (doAction == 3) {
+                    // 카트 주문
+                } else if (doAction == 4) {
+                    // 단일 상품 주문
+                } else {
+                    break;
+                }
+
+                break;
+            case 2:
+                // 로그아웃
+                keep = 0;
+                break;
+            default:
+
+        }
+        return keep;
+    }
 
 }

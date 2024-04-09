@@ -1,5 +1,6 @@
 package java_final_user_proc_2460340001_김동현.product;
 
+import java_final_user_proc_2460340001_김동현.ProcEx;
 import java_final_user_proc_2460340001_김동현.category.TbCategory;
 import java_final_user_proc_2460340001_김동현.user.TbUser;
 
@@ -102,7 +103,6 @@ public class TbProduct {
     public void setQtDeliveryFee(int qtDeliveryFee) {
         this.qtDeliveryFee = qtDeliveryFee;
     }
-//1.카테고리 조회, 2.상품 추가, 3.상품 수정, 4.상품 삭제, 5.카테고리 삭제, 6.주문, 7.로그아웃
 
 
     public int funcAdminMenu(int menu, int keep, Connection connection, TbUser tbUser) {
@@ -123,10 +123,9 @@ public class TbProduct {
 
                 System.out.println("------------------------------------------------");
                 System.out.print("1.상품 추가, 2.상품 수정, 3.상품 삭제, 4.카테고리 삭제, 5.상위 메뉴.>");
-                int doAction = new Scanner(System.in).nextInt();
+                int doAction = ProcEx.numInputValid();
                 if (doAction == 1) {    // 상품 추가
                     TbProduct newProduct = new TbProduct();
-                    System.out.println("무결성 확인 :" + detailCategory);
                     newProduct.addProduct(connection, detailCategory);
                 } else if (doAction == 2) {
                     // 상품 수정
@@ -189,7 +188,7 @@ public class TbProduct {
 
 
         String insertMappingProduct = "insert into tb_category_product_mapping(nb_category, no_product) " +
-                "values(?, 'PT'||LPAD(?, 7, '0'))";
+                "values(?, ?)";
         PreparedStatement pstmt = null;
         PreparedStatement pstmt2 = null;
         try {
@@ -236,7 +235,6 @@ public class TbProduct {
             pstmt.close();
 
 
-
             pstmt2 = connection.prepareStatement(insertMappingProduct);
             System.out.println(newProduct.getNmProduct());
 
@@ -257,9 +255,9 @@ public class TbProduct {
             e.printStackTrace();
             System.out.println("상품 추가에 실패하였습니다.");
         }
-
-
     }
+
+
 
     public void editProduct(Connection connection, int categoryNum) {
         String editing = "";

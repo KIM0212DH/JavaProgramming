@@ -1,6 +1,9 @@
 package java_final_user_proc_2460340001_김동현;
 
+import java_final_user_proc_2460340001_김동현.ecommerce.TbBasket;
+import java_final_user_proc_2460340001_김동현.ecommerce.TbBasketItem;
 import java_final_user_proc_2460340001_김동현.ecommerce.TbOrder;
+import java_final_user_proc_2460340001_김동현.ecommerce.TbOrderItem;
 import java_final_user_proc_2460340001_김동현.product.TbProduct;
 import java_final_user_proc_2460340001_김동현.user.TbUser;
 
@@ -16,25 +19,43 @@ public class ProcEx {
         Connection connection = makeConnect();
 
         TbUser tbUser = new TbUser();
+        TbBasket tbBasket = new TbBasket();
+        TbBasketItem tbBasketItem = new TbBasketItem();
+
         int keep = 1;
         while (keep > 0) {
 
             if (eComManager.getMenuStatus() == 0) {
                 int menu = tbUser.showLoginMenu();
                 keep = tbUser.funcLoginMenu(menu, keep, connection, tbUser);
+//                System.out.println(tbUser.getNoUser());
                 if (keep == 2) {
                     eComManager.setMenuStatus(1);   // 로그인 성공 시
+
+                    int nowBasketNo = tbBasket.createBasket(connection, tbUser, tbBasketItem);
+
                 }
             } else if (eComManager.getMenuStatus() == 1) {
-                TbOrder tbOrder = new TbOrder();
                 if (tbUser.getCdUserType().equals("10")) {
                     // 일반 사용자
+                    System.out.println("일반 사용자 페이지로 입장합니다.");
+                    int menu = tbUser.showGeneralMenu();
+                    TbOrder tbOrder = new TbOrder();
+                    TbOrderItem tbOrderItem = new TbOrderItem();
+                    keep = tbUser.funcGeneralMenu(menu, keep, connection, tbBasket, tbBasketItem, tbOrder, tbUser);
+
+                    if (keep == 0) {
+                        eComManager.setMenuStatus(0);
+                        keep = 1;
+                    }
+
 
                 } else if (tbUser.getCdUserType().equals("20")) {
                     // 관리자 전용
-                    TbProduct tbProduct = new TbProduct();
                     System.out.println("관리자 페이지로 입장합니다.");
                     int menu = tbUser.showAdminMenu();
+
+                    TbProduct tbProduct = new TbProduct();
                     keep = tbProduct.funcAdminMenu(menu, keep, connection, tbUser);
                     if (keep == 0) {
                         eComManager.setMenuStatus(0);
@@ -50,16 +71,12 @@ public class ProcEx {
 
     public int getMenuStatus() {
         return menuStatus;
-        // 0은 로그인/회원가입 메뉴
-        // 11은 관리자 로그인 후 화면 (카테고리 조회1 (카테고리 조회2), 상품 추가, 상품 수정, 상품 삭제, 주문, 카테고리 삭제, 로그아웃)
-        // 12는 카테고리 조회2
-        // 21는 일반 로그인 후 화면
-        // 31는 주문 화면 ()
     }
 
     public void setMenuStatus(int menuStatus) {
         this.menuStatus = menuStatus;
     }
+
 
     public static Connection makeConnect() {
         Connection conn = null;
