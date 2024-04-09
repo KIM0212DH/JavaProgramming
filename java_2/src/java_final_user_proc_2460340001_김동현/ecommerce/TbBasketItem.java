@@ -81,6 +81,32 @@ public class TbBasketItem {
         this.qtBasketItemAmount = qtBasketItemAmount;
     }
 
+    public void checkBasketItem(Connection connection, String nowUserNo, int nowBasketNo) {
+        String checking = "select nb_basket_item, nb_basket, no_product, qt_basket_item " +
+                "from tb_basket_item where nb_basket = ?";
+        try {
+            PreparedStatement pstmt = connection.prepareStatement(checking);
+            pstmt.setInt(1, nowBasketNo);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                System.out.println("------------------------------------------------");
+                System.out.println("장바구니 품목 식별번호: " + rs.getInt(1) +
+                        "\t장바구니 식별번호: " + rs.getInt(2) +
+                        "\t상품 코드: " + rs.getString(3) +
+                        "\t장바구니 품목 수량: " + rs.getInt(4));
+            }
+            System.out.println();
+            try {
+                pstmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void insertIntoBasketItem(Connection connection, String nowUserNo, int nowBasketNo, String nowProductNo, int qtBasketItem) {
         String checkReady = "select * from TB_BASKET_ITEM where no_user = ?";
         int alreadyIn = 0;
@@ -142,8 +168,24 @@ public class TbBasketItem {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
 
-
+    public void deleteFromBasketItem(Connection connection, int nowBasketNo, String deleteTarget) {
+        String deleting = "delete from tb_basket_item where no_product = ? and nb_basket = ? ";
+        try {
+            PreparedStatement pstmt = connection.prepareStatement(deleting);
+            pstmt.setString(1, deleteTarget);
+            pstmt.setInt(2, nowBasketNo);
+            pstmt.executeUpdate();
+            try {
+                pstmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            System.out.println("tb_basket_item 에서 " + deleteTarget + " 이 삭제되었습니다.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 

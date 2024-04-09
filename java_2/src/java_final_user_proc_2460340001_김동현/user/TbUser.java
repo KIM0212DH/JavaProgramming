@@ -114,7 +114,7 @@ public class TbUser {
         String tryId = loginScanner.nextLine();
         System.out.print("비밀번호를 입력하세요.>");
         String tryPW = loginScanner.nextLine();
-        String selectUser = "select id_user, nm_passwd, CD_USER_TYPE, no_user from tb_user " +
+        String selectUser = "select id_user, nm_passwd, CD_USER_TYPE, no_user, nm_user from tb_user " +
                 "where id_user = ? and nm_passwd = ?";
         try {
             PreparedStatement pstmt = connection.prepareStatement(selectUser);
@@ -127,18 +127,21 @@ public class TbUser {
             String targetPW = "";
             String targetType = "";
             String targetNo = "";
+            String targetNM = "";
             while (rs.next()) {
                 rowcount++;
                 targetId = rs.getString(1);
                 targetPW = rs.getString(2);
                 targetType = rs.getString(3);
                 targetNo = rs.getString(4);
+                targetNM = rs.getString(5);
             }
             if (rowcount == 1) {
                 tbUser.setIdUser(targetId);
                 tbUser.setNmPaswd(targetPW);
                 tbUser.setCdUserType(targetType);
                 tbUser.setNoUser(targetNo);
+                tbUser.setNmUser(targetNM);
                 System.out.println(tbUser.getIdUser() + " 계정에 로그인 하였습니다.");
                 keep = 2;
             } else {
@@ -285,12 +288,16 @@ public class TbUser {
                 TbCategory detailTargetCategory = new TbCategory();
                 detailTargetCategory = targetCategory.selectCategory(connection, detailCategory);
                 System.out.println("------------------------------------------------");
-                System.out.print("1.카트에 상품 추가, 2.카트에서 상품 삭제, 3.카트 주문, 4.개별 상품 주문, 5.상위 메뉴.>");
+                System.out.print("1.카트 조회, 2.카트에 상품 추가, 3.카트에서 상품 삭제, 4.카트 주문, 5.개별 상품 주문, 6.상위 메뉴.>");
                 int doAction = ProcEx.numInputValid();
                 String nowUserNo = tbUser.getNoUser();
                 int nowBasketNo = tbBasketItem.getNbBasketItem();
-                System.out.println(nowBasketNo+"sdfdsf");
                 if (doAction == 1) {
+                    // 장바구니 내부 조회
+                    System.out.println("------------------------------------------------");
+                    System.out.println(tbUser.getNmUser() + "의 장바구니 품목을 확인합니다.");
+                    tbBasketItem.checkBasketItem(connection, nowUserNo, nowBasketNo);
+                } else if (doAction == 2) {
                     // 카트에 상품 추가
                     System.out.println(nowUserNo);
                     System.out.println(nowBasketNo);
@@ -300,12 +307,21 @@ public class TbUser {
                     int nowAmount = ProcEx.numInputValid();
                     tbBasketItem.insertIntoBasketItem(connection, nowUserNo, nowBasketNo, nowProduct, nowAmount);
                     tbBasket.calculateBasket(connection, nowUserNo, nowBasketNo);
-                } else if (doAction == 2) {
-                    // 카트에서 상품 삭제
-
                 } else if (doAction == 3) {
-                    // 카트 주문
+                    // 카트에서 상품 삭제
+                    System.out.println();
+                    System.out.println("------------------------------------------------");
+                    System.out.println(tbUser.getNmUser() + "의 장바구니 품목을 확인합니다.");
+                    tbBasketItem.checkBasketItem(connection, nowUserNo, nowBasketNo);
+                    System.out.print("삭제할 장바구니 품목 식별번호를 입력하세요.>");
+                    String deleteTargetItem = new Scanner(System.in).nextLine();
+                    tbBasketItem.deleteFromBasketItem(connection, nowBasketNo, deleteTargetItem);
                 } else if (doAction == 4) {
+                    // 카트 주문
+                    System.out.println("------------------------------------------------");
+                    System.out.println("카트에 담긴 모든 물건을 구입합니다.");
+
+                } else if (doAction == 5) {
                     // 단일 상품 주문
                 } else {
                     break;
