@@ -5,11 +5,14 @@ import java_final_user_proc_2460340001_김동현.category.TbCategory;
 import java_final_user_proc_2460340001_김동현.ecommerce.TbBasket;
 import java_final_user_proc_2460340001_김동현.ecommerce.TbBasketItem;
 import java_final_user_proc_2460340001_김동현.ecommerce.TbOrder;
+import java_final_user_proc_2460340001_김동현.ecommerce.TbOrderItem;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 import static java_final_user_proc_2460340001_김동현.ProcEx.numInputValid;
@@ -319,10 +322,39 @@ public class TbUser {
                 } else if (doAction == 4) {
                     // 카트 주문
                     System.out.println("------------------------------------------------");
-                    System.out.println("카트에 담긴 모든 물건을 구입합니다.");
-
+                    System.out.println("장바구니에 담긴 모든 물건을 구입합니다.");
+                    TbOrder newOrder = new TbOrder();
+                    TbOrderItem newOrderItem = new TbOrderItem();
+                    ArrayList<String> waitingOrder = tbOrder.getOrderProductList(connection, nowUserNo);
+                    int totalDeliveryFee = 0;
+                    int totalPrice = 0;
+                    for (String wo : waitingOrder) {
+                        System.out.println("장바구니에 담긴 " + wo + "를 구매 시도합니다.");
+                        totalDeliveryFee += newOrder.getDeliFee(connection, wo);
+                        totalPrice += newOrder.getOrderAmount(connection, wo, nowBasketNo);
+                    }
+                    System.out.println(totalDeliveryFee);
+                    System.out.println(totalPrice);
+                    String nowSeq = newOrder.orderingBasket(connection, tbUser, totalDeliveryFee, totalPrice);
+                    for (String wo: waitingOrder) {
+                        newOrderItem.orderingBasketItem(connection, nowSeq, wo, tbUser, nowBasketNo);
+                    }
+//                    System.out.println(deliverPeriod);
                 } else if (doAction == 5) {
                     // 단일 상품 주문
+                    TbOrder newOrder = new TbOrder();
+                    TbOrderItem newOrderItem = new TbOrderItem();
+                    System.out.println("------------------------------------------------");
+                    System.out.print("주문 하고자하는 상품의 상품번호를 입력하세요.>");
+                    String orderProduct = new Scanner(System.in).nextLine();
+                    System.out.print("주문 하고자하는 개수를 입력하세요.>");
+                    int orderAmount = ProcEx.numInputValid();
+                    int deliveryFee = tbOrder.getDeliFee(connection, orderProduct);
+                    String orderPerson = tbUser.getNmUser();
+                    String nowSeq = newOrder.ordering(connection, tbUser, orderProduct, orderAmount, deliveryFee, orderPerson);
+                    newOrderItem.orderingItem(connection, nowSeq, orderProduct, tbUser, orderAmount, deliveryFee);
+
+
                 } else {
                     break;
                 }
@@ -338,4 +370,7 @@ public class TbUser {
         return keep;
     }
 
+    public static int getMax(int num1, int num2) {
+        return num1 > num2 ? num1 : num2;
+    }
 }

@@ -109,7 +109,7 @@ public class TbBasketItem {
 
     public void insertIntoBasketItem(Connection connection, String nowUserNo, int nowBasketNo, String nowProductNo, int qtBasketItem) {
         String checkReady = "select * from TB_BASKET_ITEM where no_user = ?";
-        int alreadyIn = 0;
+        int alreadyIn = 1;
         try {
             PreparedStatement pstmt = connection.prepareStatement(checkReady);
             pstmt.setString(1, nowUserNo);
