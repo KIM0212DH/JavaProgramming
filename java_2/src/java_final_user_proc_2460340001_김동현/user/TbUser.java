@@ -348,6 +348,7 @@ public class TbUser {
                     int orderAmount = ProcEx.numInputValid();
                     int deliveryFee = tbOrder.getDeliFee(connection, orderProduct);
                     String orderPerson = tbUser.getNmUser();
+                    System.out.println(orderProduct+"를 "+orderAmount+"개 주문하였습니다.");
                     String nowSeq = newOrder.ordering(connection, tbUser, orderProduct, orderAmount, deliveryFee, orderPerson);
                     newOrderItem.orderingItem(connection, nowSeq, orderProduct, tbUser, orderAmount, deliveryFee);
 
