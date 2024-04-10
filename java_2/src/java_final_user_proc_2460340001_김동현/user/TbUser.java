@@ -303,7 +303,7 @@ public class TbUser {
                     tbBasketItem.checkBasketItem(connection, nowUserNo, nowBasketNo);
                 } else if (doAction == 2) {
                     // 카트에 상품 추가
-                    System.out.print("장바구니에 추가하고 싶은 상품 번호를 입력하세요.>");
+                    System.out.print("장바구니에 추가하고 싶은 상품 번호를 입력하세요. 예)PT0000011 >");
                     String nowProduct = new Scanner(System.in).nextLine();
                     System.out.print("장바구니에 추가하고 싶은 개수를 입력하세요.>");
                     int nowAmount = ProcEx.numInputValid();
@@ -328,12 +328,10 @@ public class TbUser {
                     int totalDeliveryFee = 0;
                     int totalPrice = 0;
                     for (String wo : waitingOrder) {
-                        System.out.println("장바구니에 담긴 " + wo + "를 구매 시도합니다.");
+                        System.out.println("장바구니에 담긴 " + wo + "를 구매합니다.");
                         totalDeliveryFee += newOrder.getDeliFee(connection, wo);
                         totalPrice += newOrder.getOrderAmount(connection, wo, nowBasketNo);
                     }
-                    System.out.println(totalDeliveryFee);
-                    System.out.println(totalPrice);
                     String nowSeq = newOrder.orderingBasket(connection, tbUser, totalDeliveryFee, totalPrice);
                     for (String wo: waitingOrder) {
                         newOrderItem.orderingBasketItem(connection, nowSeq, wo, tbUser, nowBasketNo);

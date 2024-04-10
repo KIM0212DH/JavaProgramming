@@ -93,7 +93,7 @@ public class TbBasket {
             pstmt.setInt(1, total);
             pstmt.setInt(2, nowBasketNo);
             int rows = pstmt.executeUpdate();
-            System.out.println(rows+"개 데이터가 tb_basket에서 수정되었습니다.");
+
 
         }catch (SQLException e){
             e.printStackTrace();
