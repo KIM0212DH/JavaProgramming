@@ -292,7 +292,7 @@ public class TbUser {
                 TbCategory detailTargetCategory = new TbCategory();
                 detailTargetCategory = targetCategory.selectCategory(connection, detailCategory);
                 System.out.println("------------------------------------------------");
-                System.out.print("1.카트 조회, 2.카트에 상품 추가, 3.카트에서 상품 삭제, 4.카트 주문, 5.개별 상품 주문, 6.상위 메뉴.>");
+                System.out.print("1.장바구니 조회, 2.장바구니에 상품 추가, 3.장바구니에서 상품 삭제, 4.장바구니 주문, 5.개별 상품 주문, 6.상위 메뉴.>");
                 int doAction = ProcEx.numInputValid();
                 String nowUserNo = tbUser.getNoUser();
                 int nowBasketNo = tbBasketItem.getNbBasketItem();
@@ -305,9 +305,9 @@ public class TbUser {
                     // 카트에 상품 추가
                     System.out.println(nowUserNo);
                     System.out.println(nowBasketNo);
-                    System.out.print("카트에 추가하고 싶은 상품 번호를 입력하세요.>");
+                    System.out.print("장바구니에 추가하고 싶은 상품 번호를 입력하세요.>");
                     String nowProduct = new Scanner(System.in).nextLine();
-                    System.out.print("카트에 추가하고 싶은 개수를 입력하세요.>");
+                    System.out.print("장바구니에 추가하고 싶은 개수를 입력하세요.>");
                     int nowAmount = ProcEx.numInputValid();
                     tbBasketItem.insertIntoBasketItem(connection, nowUserNo, nowBasketNo, nowProduct, nowAmount);
                     tbBasket.calculateBasket(connection, nowUserNo, nowBasketNo);
