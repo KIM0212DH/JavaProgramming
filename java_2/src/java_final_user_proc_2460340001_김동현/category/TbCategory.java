@@ -131,6 +131,8 @@ public class TbCategory {
                 System.out.print("\t상품 번호: " + rs.getString(6));
                 System.out.print("\t상품 이름: " + rs.getString(4));
                 System.out.print("\t상품 설명: " + rs.getString(5));
+                System.out.println("------------------------------------------------");
+
                 System.out.println();
                 extractCategory.setNbCategory(rs.getInt(1));
                 extractCategory.setNbParentCategory(rs.getInt(2));

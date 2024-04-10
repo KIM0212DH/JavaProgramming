@@ -84,6 +84,7 @@ public class TbUser {
 
     public int showLoginMenu() {
         System.out.println("------------------------------------------------");
+        System.out.println("관리자 아이디/비밀번호 Admin1/Admin1, 일반 사용자 User1/User1");
         System.out.println("1.로그인, 2.회원가입, 3.프로그램 종료");
         System.out.print("선택>");
         return numInputValid();

@@ -222,7 +222,6 @@ public class TbOrderItem {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 productPrice = rs.getInt(1);
-                System.out.println("ddd"+productPrice);
             }
             try {
                 pstmt.close();
@@ -262,9 +261,30 @@ public class TbOrderItem {
             pstmt.setInt(1, nowBasketNum);
             pstmt.setString(2, tbUser.getNoUser());
             int rows = pstmt.executeUpdate();
+            try {
+                pstmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+//        String deleteFromOrder = "delete from tb_basket where nb_basket = ? and no_user = ?";
+//        try {
+//            PreparedStatement pstmt = connection.prepareStatement(deleteFromOrder);
+//            pstmt.setInt(1, nowBasketNum);
+//            pstmt.setString(2, tbUser.getNoUser());
+//            int rows = pstmt.executeUpdate();
+//            try {
+//                pstmt.close();
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+
     }
 
 }

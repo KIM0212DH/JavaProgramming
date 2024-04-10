@@ -6,16 +6,13 @@ import java_final_user_proc_2460340001_김동현.user.TbUser;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Scanner;
 
 public class TbProduct {
     String noProduct;
     String nmProduct;
-    String nmDetailExplain;
+    Clob nmDetailExplain;
     String dtStartDate;
     String idFile;
     String dtEndDate;
@@ -40,11 +37,11 @@ public class TbProduct {
         this.nmProduct = nmProduct;
     }
 
-    public String getNmDetailExplain() {
+    public Clob getNmDetailExplain() {
         return nmDetailExplain;
     }
 
-    public void setNmDetailExplain(String nmDetailExplain) {
+    public void setNmDetailExplain(Clob nmDetailExplain) {
         this.nmDetailExplain = nmDetailExplain;
     }
 
@@ -156,17 +153,68 @@ public class TbProduct {
 
     public void addProduct(Connection connection, int categoryNum) {
         TbProduct newProduct = new TbProduct();
+        TbContent newTbContent = new TbContent();
         Scanner addProductScanner = new Scanner(System.in);
         System.out.println("------------------------------------------------");
         System.out.println("상품 추가를 시도합니다.");
         System.out.print("추가할 상품명을 입력하세요.>");
         newProduct.setNmProduct(addProductScanner.nextLine());
-        System.out.print("상품의 상세 설명을 입력하세요.>");
-        newProduct.setNmDetailExplain(addProductScanner.nextLine());
+        System.out.print("상품의 상세 설명을 입력하세요.입력 종료는 END 입력.>");
+        String detailExplain = TbProduct.multiLineStatement(new Scanner(System.in));
+        try {
+            Clob newClob = TbProduct.convertStringToClob(detailExplain, connection);
+            newProduct.setNmDetailExplain(newClob);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        System.out.print("저장할 사진의 경로를 입력하세요.>");
+        String fullPath = new Scanner(System.in).nextLine();
+        String insertContent = "insert into tb_content(id_file, bo_save_file, da_save, cn_hit, nm_org_file) " +
+                "values('IF'||LPAD(SEQ_TB_CONTENT.nextval,5,'0'), ?, SYSDATE, 0, ?)";
+        try {
+            PreparedStatement pstmt = connection.prepareStatement(insertContent);
+            try {
+                pstmt.setBlob(1, new FileInputStream(fullPath));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            pstmt.setString(2, fullPath);
+            int rows = pstmt.executeUpdate();
+            try {
+                pstmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        String nowIdFile = "";
+        String getIdFile = "select id_file from tb_content where nm_org_file = ?";
+        try {
+            PreparedStatement pstmt = connection.prepareStatement(getIdFile);
+            pstmt.setString(1, fullPath);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                nowIdFile = rs.getString(1);
+                break;
+            }
+            try {
+                pstmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            newProduct.setIdFile(nowIdFile);
+        }
+
+
         System.out.print("상품의 판매 시작 일자를 입력하세요.>");
         newProduct.setDtStartDate(addProductScanner.nextLine());
-        System.out.print("컨텐츠 식별 ID를 입력하세요.>");
-        newProduct.setIdFile(addProductScanner.nextLine());
+
         System.out.print("상품의 판매 종료 일자를 입력하세요.>");
         newProduct.setDtEndDate(addProductScanner.nextLine());
 
@@ -194,7 +242,7 @@ public class TbProduct {
         try {
             pstmt = connection.prepareStatement(insertProduct);
             pstmt.setString(1, newProduct.getNmProduct());
-            pstmt.setString(2, newProduct.getNmDetailExplain());
+            pstmt.setClob(2, newProduct.getNmDetailExplain());
             pstmt.setString(3, newProduct.getDtStartDate());
             pstmt.setString(4, newProduct.getIdFile());
 
@@ -220,7 +268,6 @@ public class TbProduct {
                 ResultSet rs = getSeqPstmt.executeQuery();
                 while (rs.next()) {
                     nowSeq = rs.getString(1);
-                    System.out.println("ns: " + nowSeq);
                 }
                 try {
                     getSeqPstmt.close();
@@ -228,7 +275,6 @@ public class TbProduct {
                     e.printStackTrace();
                 }
             } catch (SQLException e) {
-                System.out.println("ddd");
                 e.printStackTrace();
             }
 
@@ -236,12 +282,10 @@ public class TbProduct {
 
 
             pstmt2 = connection.prepareStatement(insertMappingProduct);
-            System.out.println(newProduct.getNmProduct());
 
             pstmt2.setInt(1, categoryNum);
             pstmt2.setString(2, nowSeq);
-            System.out.println("nowSeq: " + nowSeq);
-            System.out.println("categoryNum: " + categoryNum);
+
 
 
             rows = pstmt2.executeUpdate();
@@ -256,7 +300,6 @@ public class TbProduct {
             System.out.println("상품 추가에 실패하였습니다.");
         }
     }
-
 
 
     public void editProduct(Connection connection, int categoryNum) {
@@ -290,12 +333,60 @@ public class TbProduct {
         System.out.println("상품 변경을 시도합니다.");
         System.out.print("변경할 상품명을 입력하세요.>");
         oldProduct.setNmProduct(editProductScanner.nextLine());
-        System.out.print("변경할 상품의 상세 설명을 입력하세요.>");
-        oldProduct.setNmDetailExplain(editProductScanner.nextLine());
+        System.out.print("변경할 상품의 상세 설명을 입력하세요. 입력 종료는 END 입력.>");
+        String editDetailExplain = TbProduct.multiLineStatement(new Scanner(System.in));
+        try {
+            Clob newClob = TbProduct.convertStringToClob(editDetailExplain, connection);
+            oldProduct.setNmDetailExplain(newClob);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        String nowIdFile = "";
+        String getIdFileSql = "select id_file from tb_product where no_product = ?";
+        try {
+            PreparedStatement pstmt = connection.prepareStatement(getIdFileSql);
+            pstmt.setString(1, editing);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                nowIdFile = rs.getString(1);
+                break;
+            }
+            try {
+                pstmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.print("변경할 상품의 새로운 사진 경로를 입력하세요.>");
+        String fullPath = new Scanner(System.in).nextLine();
+        String changeBlobSql = "update tb_content set bo_save_file = ?, nm_org_file = ? where id_file = ?";
+        try {
+            PreparedStatement pstmt = connection.prepareStatement(changeBlobSql);
+            try {
+                pstmt.setBlob(1, new FileInputStream(fullPath));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            pstmt.setString(2, fullPath);
+            pstmt.setString(3, nowIdFile);
+            int rows = pstmt.executeUpdate();
+            try {
+                pstmt.close();
+            }catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
         System.out.print("변경할 상품의 판매 시작 일자를 입력하세요.>");
         oldProduct.setDtStartDate(editProductScanner.nextLine());
-        System.out.print("변경할 컨텐츠 식별 ID를 입력하세요.>");
-        oldProduct.setIdFile(editProductScanner.nextLine());
+
         System.out.print("변경할 상품의 판매 종료 일자를 입력하세요.>");
         oldProduct.setDtEndDate(editProductScanner.nextLine());
 
@@ -314,7 +405,6 @@ public class TbProduct {
                 .append("nm_product=?, ")
                 .append("nm_detail_explain=?, ")
                 .append("dt_start_date=?, ")
-                .append("id_file=?, ")
                 .append("dt_end_date=?, ")
                 .append("qt_customer=?, ")
                 .append("qt_sale_price=?, ")
@@ -325,17 +415,14 @@ public class TbProduct {
         try {
             PreparedStatement pstmt = connection.prepareStatement(updateSql);
             pstmt.setString(1, oldProduct.getNmProduct());
-            pstmt.setString(2, oldProduct.getNmDetailExplain());
+            pstmt.setClob(2, oldProduct.getNmDetailExplain());
             pstmt.setString(3, oldProduct.getDtStartDate());
-            pstmt.setString(4, oldProduct.getIdFile());
-//                pstmt.setBlob(4, new FileInputStream("C:/Users/USER/Pictures/Screenshots/4.png"));
-
-            pstmt.setString(5, oldProduct.getDtEndDate());
-            pstmt.setInt(6, oldProduct.getQtCustomer());
-            pstmt.setInt(7, oldProduct.getQtSalePrice());
-            pstmt.setInt(8, oldProduct.getQtStock());
-            pstmt.setInt(9, oldProduct.getQtDeliveryFee());
-            pstmt.setString(10, editing);
+            pstmt.setString(4, oldProduct.getDtEndDate());
+            pstmt.setInt(5, oldProduct.getQtCustomer());
+            pstmt.setInt(6, oldProduct.getQtSalePrice());
+            pstmt.setInt(7, oldProduct.getQtStock());
+            pstmt.setInt(8, oldProduct.getQtDeliveryFee());
+            pstmt.setString(9, editing);
             int rows = pstmt.executeUpdate();
             System.out.println(rows + "개 게시물을 수정하였습니다.");
             try {
@@ -369,5 +456,22 @@ public class TbProduct {
         }
     }
 
+    public static String multiLineStatement(Scanner sc) {
+        StringBuilder sb = new StringBuilder(); // 문자열을 누적할 StringBuilder 객체 생성
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+            if ("END".equals(line)) { // 사용자가 "EOF"를 입력하면 반복을 종료
+                break;
+            }
+            sb.append(line).append("\n"); // 입력받은 줄을 StringBuilder 객체에 추가
+        }
+        return sb.toString(); // 누적된 문자열 반환
+    }
+
+    static Clob convertStringToClob(String str, Connection connection) throws SQLException {
+        Clob myClob = connection.createClob();
+        myClob.setString(1, str);
+        return myClob;
+    }
 
 }

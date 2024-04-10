@@ -43,10 +43,9 @@ public class TbBasket {
 
         try {
             PreparedStatement pstmt = connection.prepareStatement(createBasket);
-            System.out.println(tbUser.getNoUser());
             pstmt.setString(1, tbUser.getNoUser());
             int rows = pstmt.executeUpdate();
-            System.out.println(rows + "개 basket을 추가했습니다.");
+//            System.out.println(rows + "개 basket을 추가했습니다.");
 
             String getBasketNo = "select nb_basket from tb_basket where no_user=? ";
             pstmt = connection.prepareStatement(getBasketNo);

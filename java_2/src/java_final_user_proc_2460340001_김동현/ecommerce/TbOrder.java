@@ -143,8 +143,6 @@ public class TbOrder {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            System.out.println(totalPrice);
-
             return totalPrice;
         }
     }
