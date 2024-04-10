@@ -303,8 +303,6 @@ public class TbUser {
                     tbBasketItem.checkBasketItem(connection, nowUserNo, nowBasketNo);
                 } else if (doAction == 2) {
                     // 카트에 상품 추가
-                    System.out.println(nowUserNo);
-                    System.out.println(nowBasketNo);
                     System.out.print("장바구니에 추가하고 싶은 상품 번호를 입력하세요.>");
                     String nowProduct = new Scanner(System.in).nextLine();
                     System.out.print("장바구니에 추가하고 싶은 개수를 입력하세요.>");
